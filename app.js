@@ -1,15 +1,15 @@
-const path = require('path');
 const fs = require('fs'); // uses 'fs' node module to manipulate on files system
-const TeamResult = require('./TeamResultModel.js');
-const GameResult = require('./GameResultModel.js');
+const path = require('path'); // uses 'path' node module 
+const TeamResult = require('./TeamResultModel.js'); // model contains TeamResult class
+const GameResult = require('./GameResultModel.js'); // model contains GameResult class
 
-// validates of user's input
-const nodeFilenamePath = process.argv[1];
-const nodeFilename = path.basename(nodeFilenamePath);
+// validates user's input:
+const nodeFilenamePath = process.argv[1]; // uses process.argv method to retrieve user's input from command line
+const nodeFilename = path.basename(nodeFilenamePath); // uses basename method from 'path' node module to extract filename from path
 
-if (nodeFilename === '_mocha') {
+if (nodeFilename === '_mocha') { // special case for testing application
     console.log('testing with mocha');
-} else {
+} else { 
     if ((process.argv.length < 3) || (process.argv.length > 3)) {
         console.log('Invalid input. Type: node ' + nodeFilename + ' FILENAME');
         process.exit(1);
@@ -19,10 +19,10 @@ if (nodeFilename === '_mocha') {
     processGameData(userFilename);
 }
 
-// reads data from file using async readFile method
+// reads data from file using async readFile method from 'fs' node module
 function processGameData(userFilename) {
     fs.readFile(userFilename, 'utf8', function(err, data) {
-        if (err) {
+        if (err) { // to handle incorrect user filename
             console.log(err.message);
         } else {
             console.log('Processed file: ' + userFilename);
@@ -34,17 +34,16 @@ function processGameData(userFilename) {
     });
 }
 
-
-// function to parse string into TeamResult object
+// function to parse string into TeamResult object; accepts string and returns new TeamResult {teamName:teamName, teamPoints:teamPoints}
 function teamStringParse(team) {
     team = team.trim();
     const teamArray = team.split(' ');
-    const teamScore = parseInt(teamArray.pop()); // scores (number)
-    const teamName = teamArray.join(' '); // name
+    const teamScore = parseInt(teamArray.pop());
+    const teamName = teamArray.join(' ');
     return new TeamResult(teamName, teamScore);
 }
 
-// function to extract data from file and transform it into array of objects (GameResult class instances)
+// function to extract data from file and transform it into array of objects; accepts text file and returns array of GameResult {team1:TeamResult{},team2:TeamResult{}} instances
 function fileProcessor(data) {
     let games = [];
     const fileLines = data.split('\n');
@@ -56,7 +55,7 @@ function fileProcessor(data) {
     return games;
 }
 
-// function to calculate points for each game, return value is map
+// function to calculate points for each game; accepts array of GameResult objects and returns map with teamNames as keys and TeamResult objects as values
 function gamePointsCalculator(games) {
     let gameRanking = {};
     games.forEach(function(game) {
@@ -75,6 +74,7 @@ function gamePointsCalculator(games) {
             team2.teamPoints = 3;
         }
 
+        // team1
         if (gameRanking[team1.teamName] === undefined) {
             gameRanking[team1.teamName] = team1;
         } else { // cumulate points from games
@@ -82,6 +82,7 @@ function gamePointsCalculator(games) {
             gameRanking[team1.teamName].teamPoints += tempPoints;
         }
 
+        //team2
         if (gameRanking[team2.teamName] === undefined) {
             gameRanking[team2.teamName] = team2;
         } else { // cumulate points from games
@@ -92,7 +93,7 @@ function gamePointsCalculator(games) {
     return gameRanking;
 }
 
-// function to create groups of teams with the same amount of points
+// function to create groups of teams with the same amount of points; accepts map with teamNames as keys and TeamResult objects as values and returns map with points as keys and arrays with teamNames as values
 function groupsConstructor(teamRanking) {
     const ranking = Object.values(teamRanking);
     let teamsOrder = {};
@@ -105,12 +106,12 @@ function groupsConstructor(teamRanking) {
     });
     return teamsOrder;
 }
-
+// function to print sorted ranking to console with calculated position; accepts map with points as keys and arrays with teamNames as values and print strings to console
 function groupsSortPrint(groups) {
-    const sortedPointsArray = (Object.keys(groups)).sort().reverse();
+    const sortedPointsArray = (Object.keys(groups)).sort().reverse(); // descendent order to sort teams from bigest to smallest number of points
     let position = 1;
     sortedPointsArray.forEach(function(point) {
-        const group = (groups[point]).sort();
+        const group = (groups[point]).sort(); // sort teamNames in alphabetical order
         group.forEach(function(team) {
             console.log(position + '. ' + team + ', ' + pointsToString(point));
         });
@@ -118,9 +119,9 @@ function groupsSortPrint(groups) {
     })
 }
 
-// checks point value and convert it into proper string
+// function to check point value and convert it into proper string, accept number and return formatted string
 function pointsToString(point) {
-    if (point == 1) {
+    if (point === 1) {
         point = '1 pt';
     } else {
         point = point + ' pts';
