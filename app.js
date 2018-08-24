@@ -133,7 +133,6 @@ module.exports.teamStringParse = teamStringParse;
 module.exports.fileProcessor = fileProcessor;
 module.exports.gamePointsCalculator = gamePointsCalculator;
 module.exports.groupsConstructor = groupsConstructor;
-module.exports.groupsSortPrint = groupsSortPrint;
 module.exports.TeamResult = TeamResult;
 module.exports.GameResult = GameResult;
 module.exports.pointsToString = pointsToString;
